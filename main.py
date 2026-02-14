@@ -82,34 +82,50 @@ def stream_llm_api(prompt: str):
         "stream": True
     }
 
+    print("=== STREAM START ===")
+    print("Sending payload to OpenAI:", payload)
+
     with requests.post(LLM_API_URL, json=payload, headers=headers, stream=True) as r:
+        print("OpenAI response status:", r.status_code)
         r.raise_for_status()
+
         for line in r.iter_lines():
             if not line:
                 continue
 
             decoded = line.decode("utf-8")
+            print("RAW LINE:", decoded)  # <--- LOG RAW SSE LINE
+
             if not decoded.startswith("data: "):
                 continue
 
             data = decoded.replace("data: ", "")
             if data == "[DONE]":
+                print("=== STREAM END ===")
                 break
 
             try:
-                delta = json.loads(data)["choices"][0]["delta"]
+                chunk = json.loads(data)
+                print("DECODED CHUNK:", chunk)  # <--- LOG PARSED JSON
+
+                delta = chunk["choices"][0]["delta"]
 
                 # Skip role-only or empty chunks
                 if "content" not in delta:
+                    print("SKIPPED (no content):", delta)
                     continue
 
                 token = delta["content"]
+                print("TOKEN:", token)  # <--- LOG TOKEN
+
                 if token:
                     yield token
                     time.sleep(0.01)
 
-            except Exception:
+            except Exception as e:
+                print("ERROR PARSING CHUNK:", e)
                 continue
+
 
 
 
@@ -144,4 +160,5 @@ def reply(request: ChatRequest):
     conversation_history.append({"role": "assistant", "content": reply_text})
 
     return {"reply": reply_text, "sentiment": sentiment}
+
 
