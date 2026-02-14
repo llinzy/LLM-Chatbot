@@ -7,8 +7,12 @@ import json
 import time
 import os
 from datetime import datetime
+import pytz
 
-current_time = datetime.now().strftime("%A, %B %d, %Y %I:%M %p")
+
+eastern = pytz.timezone("America/New_York")
+current_time = datetime.now(eastern).strftime("%A, %B %d, %Y %I:%M %p")
+
 
 
 LLM_API_URL = "https://api.openai.com/v1/chat/completions"
@@ -46,7 +50,11 @@ def detect_sentiment(text: str) -> str:
 
 def call_llm_api(prompt: str) -> str:
     from datetime import datetime
-    current_time = datetime.now().strftime("%A, %B %d, %Y %I:%M %p")
+    import pytz
+    
+    
+    eastern = pytz.timezone("America/New_York")
+    current_time = datetime.now(eastern).strftime("%A, %B %d, %Y %I:%M %p")
 
     headers = {
         "Authorization": f"Bearer {LLM_API_KEY}",
@@ -74,7 +82,11 @@ def call_llm_api(prompt: str) -> str:
 
 def stream_llm_api(prompt: str):
     from datetime import datetime
-    current_time = datetime.now().strftime("%A, %B %d, %Y %I:%M %p")
+    import pytz
+    
+    
+    eastern = pytz.timezone("America/New_York")
+    current_time = datetime.now(eastern).strftime("%A, %B %d, %Y %I:%M %p")
 
     headers = {
         "Authorization": f"Bearer {LLM_API_KEY}",
@@ -176,6 +188,7 @@ def reply(request: ChatRequest):
     conversation_history.append({"role": "assistant", "content": reply_text})
 
     return {"reply": reply_text, "sentiment": sentiment}
+
 
 
 
