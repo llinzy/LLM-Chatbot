@@ -85,19 +85,32 @@ def stream_llm_api(prompt: str):
     with requests.post(LLM_API_URL, json=payload, headers=headers, stream=True) as r:
         r.raise_for_status()
         for line in r.iter_lines():
-            if line:
-                decoded = line.decode("utf-8")
-                if decoded.startswith("data: "):
-                    data = decoded.replace("data: ", "")
-                    if data == "[DONE]":
-                        break
-                    try:
-                        token = json.loads(data)["choices"][0]["delta"].get("content", "")
-                        if token:
-                            yield token
-                            time.sleep(0.01)
-                    except:
-                        continue
+            if not line:
+                continue
+
+            decoded = line.decode("utf-8")
+            if not decoded.startswith("data: "):
+                continue
+
+            data = decoded.replace("data: ", "")
+            if data == "[DONE]":
+                break
+
+            try:
+                delta = json.loads(data)["choices"][0]["delta"]
+
+                # Skip role-only or empty chunks
+                if "content" not in delta:
+                    continue
+
+                token = delta["content"]
+                if token:
+                    yield token
+                    time.sleep(0.01)
+
+            except Exception:
+                continue
+
 
 
 
@@ -131,3 +144,4 @@ def reply(request: ChatRequest):
     conversation_history.append({"role": "assistant", "content": reply_text})
 
     return {"reply": reply_text, "sentiment": sentiment}
+
