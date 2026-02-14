@@ -45,6 +45,9 @@ def detect_sentiment(text: str) -> str:
 
 
 def call_llm_api(prompt: str) -> str:
+    from datetime import datetime
+    current_time = datetime.now().strftime("%A, %B %d, %Y %I:%M %p")
+
     headers = {
         "Authorization": f"Bearer {LLM_API_KEY}",
         "Content-Type": "application/json"
@@ -53,7 +56,7 @@ def call_llm_api(prompt: str) -> str:
     payload = {
         "model": LLM_MODEL,
         "messages": [
-            {"role": "system", "content": "You are a helpful, emotionally aware assistant."},
+            {"role": "system", "content": f"You are a helpful, emotionally aware assistant. The current time is {current_time}."},
             *conversation_history,
             {"role": "user", "content": prompt}
         ],
@@ -68,7 +71,11 @@ def call_llm_api(prompt: str) -> str:
 
 
 
+
 def stream_llm_api(prompt: str):
+    from datetime import datetime
+    current_time = datetime.now().strftime("%A, %B %d, %Y %I:%M %p")
+
     headers = {
         "Authorization": f"Bearer {LLM_API_KEY}",
         "Content-Type": "application/json"
@@ -77,13 +84,16 @@ def stream_llm_api(prompt: str):
     payload = {
         "model": LLM_MODEL,
         "messages": [
-            {"role": "system", "content": "You are a helpful, emotionally aware assistant."},
+            {"role": "system", "content": f"You are a helpful, emotionally aware assistant. The current time is {current_time}."},
             *conversation_history,
             {"role": "user", "content": prompt}
         ],
         "temperature": 0.7,
         "stream": True
     }
+
+    # (your streaming logic stays the same)
+
 
     print("=== STREAM START ===")
     print("Sending payload to OpenAI:", payload)
@@ -166,6 +176,7 @@ def reply(request: ChatRequest):
     conversation_history.append({"role": "assistant", "content": reply_text})
 
     return {"reply": reply_text, "sentiment": sentiment}
+
 
 
 
