@@ -6,6 +6,9 @@ import requests
 import json
 import time
 import os
+from datetime import datetime
+
+current_time = datetime.now().strftime("%A, %B %d, %Y %I:%M %p")
 
 
 LLM_API_URL = "https://api.openai.com/v1/chat/completions"
@@ -144,6 +147,9 @@ def home():
 
 @app.post("/reply")
 def reply(request: ChatRequest):
+    from datetime import datetime
+    current_time = datetime.now().strftime("%A, %B %d, %Y %I:%M %p")
+
     user_text = request.text
     sentiment = detect_sentiment(user_text)
 
@@ -160,5 +166,6 @@ def reply(request: ChatRequest):
     conversation_history.append({"role": "assistant", "content": reply_text})
 
     return {"reply": reply_text, "sentiment": sentiment}
+
 
 
