@@ -104,8 +104,6 @@ def stream_llm_api(prompt: str):
         "stream": True
     }
 
-    # (your streaming logic stays the same)
-
 
     print("=== STREAM START ===")
     print("Sending payload to OpenAI:", payload)
@@ -119,7 +117,7 @@ def stream_llm_api(prompt: str):
                 continue
 
             decoded = line.decode("utf-8")
-            print("RAW LINE:", decoded)  # <--- LOG RAW SSE LINE
+            print("RAW LINE:", decoded) 
 
             if not decoded.startswith("data: "):
                 continue
@@ -131,7 +129,7 @@ def stream_llm_api(prompt: str):
 
             try:
                 chunk = json.loads(data)
-                print("DECODED CHUNK:", chunk)  # <--- LOG PARSED JSON
+                print("DECODED CHUNK:", chunk)  
 
                 delta = chunk["choices"][0]["delta"]
 
@@ -141,7 +139,7 @@ def stream_llm_api(prompt: str):
                     continue
 
                 token = delta["content"]
-                print("TOKEN:", token)  # <--- LOG TOKEN
+                print("TOKEN:", token)  
 
                 if token:
                     yield token
@@ -188,6 +186,7 @@ def reply(request: ChatRequest):
     conversation_history.append({"role": "assistant", "content": reply_text})
 
     return {"reply": reply_text, "sentiment": sentiment}
+
 
 
 
